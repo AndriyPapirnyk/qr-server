@@ -87,3 +87,22 @@ exports.getAllUsers = async(req, res) => {
 }
 
 
+exports.getCount = async(req, res) => {
+  try{
+      const result = await User.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalCount: { $sum: "$count" }
+          }
+        }
+      ]);
+  
+      const totalCount = result.length > 0 ? result[0].totalCount : 0;
+      res.status(200).json({ totalCount });
+  } catch(error){
+    console.error(error)
+  }
+}
+
+
