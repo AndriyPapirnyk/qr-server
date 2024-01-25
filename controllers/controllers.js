@@ -5,24 +5,55 @@ exports.test = async (req, res) => {
   res.send('it is server')
 }
 
+// exports.verifyUser = async (req, res) => {
+//   try {
+//     console.log(req.deviceId);
+
+//     const existingUser = await User.findOne({ userId: req.deviceId });
+//     const today = new Date().setHours(0, 0, 0, 0);
+
+//     if (existingUser) {
+//       console.log('User exists:', existingUser);
+//       if(existingUser.lastScan && existingUser.lastScan.getTime() >= today) {
+//         res.status(200).send({user: existingUser, scanned: true})
+//       } else {
+//         existingUser.lastScan = new Date();
+//         existingUser.count = (existingUser.count || 1) + 1;
+//         res.status(200).send({user: existingUser, scanned: false})
+//       }
+//     } else {
+//       res.status(200).send({user: false, scanned: true})
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// };
+
 exports.verifyUser = async (req, res) => {
   try {
     console.log(req.deviceId);
 
     const existingUser = await User.findOne({ userId: req.deviceId });
-    const today = new Date().setHours(0, 0, 0, 0);
+    const currentTime = new Date();
+    
+    const today = new Date(currentTime).setHours(0, 0, 0, 0);
 
     if (existingUser) {
       console.log('User exists:', existingUser);
-      if(existingUser.lastScan && existingUser.lastScan.getTime() >= today) {
-        res.status(200).send('User has already scaned today', existingUser.name)
-      }
 
-      existingUser.lastScan = new Date();
-      existingUser.count = (existingUser.count || 1) + 1;
-      res.status(200).send(true);
+      if (existingUser.lastScan && existingUser.lastScan.getTime() >= today) {
+        res.status(200).send({ user: existingUser, scanned: true });
+      } else {
+        existingUser.lastScan = currentTime;
+        existingUser.count = (existingUser.count || 0) + 1;
+
+        await existingUser.save();
+
+        res.status(200).send({ user: existingUser, scanned: false });
+      }
     } else {
-      res.status(200).send(false)
+      res.status(200).send({ user: false, scanned: false });
     }
   } catch (error) {
     console.error(error);
@@ -30,14 +61,17 @@ exports.verifyUser = async (req, res) => {
   }
 };
 
+
 exports.createUser = async(req, res) => {
   try{
+    const name = req.body.name;
+    console.log(name)
     const currentDate = new Date();
       
-    const newUser = new User({ userId: req.deviceId, name: "test", count: 1, lastScan: currentDate  });
+    const newUser = new User({ userId: req.deviceId, name: name, count: 1, lastScan: currentDate  });
     await newUser.save();      
     console.log('User created:', newUser);
-    res.status(200).send(false);
+    res.status(200).send({user: newUser});
   } catch(error) {
     console.error(error)
   }
