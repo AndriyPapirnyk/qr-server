@@ -32,11 +32,11 @@ exports.test = async (req, res) => {
 
 exports.verifyUser = async (req, res) => {
   try {
-    console.log(req.deviceId);
+    const userId = req.deviceId;
+    console.log(userId);
 
-    const existingUser = await User.findOne({ userId: req.deviceId });
+    const existingUser = await User.findOne({ userId: userId });
     const currentTime = new Date();
-    
     const today = new Date(currentTime).setHours(0, 0, 0, 0);
 
     if (existingUser) {
