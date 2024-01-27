@@ -2,7 +2,7 @@ const User = require('../models/user');
 
 //
 exports.test = async (req, res) => {
-  res.send('it is server')
+  res.send(req.deviceId)
 }
 
 // exports.verifyUser = async (req, res) => {
