@@ -26,10 +26,10 @@ app.use((req, res, next) => {
   const Fingerprint2 = require('fingerprintjs2');
 
   Fingerprint2.getPromise().then(components => {
-      const fingerprint = Fingerprint2.x64hash128(components.map(pair => pair.value).join(''), 31);
+    const fingerprint = Fingerprint2.x64hash128(components.map(pair => pair.value).join(''), 31);
 
-      req.deviceId = fingerprint;
-      next();
+    req.deviceId = fingerprint;
+    next();
   });
 });
 
