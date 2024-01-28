@@ -46,6 +46,7 @@ exports.verifyUser = async (req, res) => {
         res.status(200).send({ user: existingUser, scanned: true });
       } else {
         existingUser.lastScan = currentTime;
+        existingUser.history.push(currentTime);
         existingUser.count = (existingUser.count || 0) + 1;
 
         await existingUser.save();

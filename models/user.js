@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
       name: String,
       count: Number,
       lastScan: Date,
+      history: Array,
 });
 
 module.exports = mongoose.model('User', userSchema);
