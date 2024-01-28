@@ -69,7 +69,7 @@ exports.createUser = async(req, res) => {
     console.log(name)
     const currentDate = new Date();
       
-    const newUser = new User({ userId: req.deviceId, name: name, count: 1, lastScan: currentDate  });
+    const newUser = new User({ userId: req.deviceId, name: name, count: 1, lastScan: currentDate, history: [currentDate]  });
     await newUser.save();      
     console.log('User created:', newUser);
     res.status(200).send({user: newUser});
