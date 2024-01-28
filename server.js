@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 
 function generateDeviceId(userAgent) {
   const base64Encoded = Buffer.from(userAgent).toString('base64');
-  const truncatedId = base64Encoded.slice(0, 31);
+  const truncatedId = base64Encoded.slice(16, 41);
   return truncatedId;
 }
 
