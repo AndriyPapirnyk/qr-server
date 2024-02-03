@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 // const Fingerprint2 = require('fingerprintjs2');
 const PORT = 8000;
-const device = require('express-device');
+// const device = require('express-device');
 
 
 //
@@ -14,7 +14,7 @@ const url = 'mongodb+srv://DBproject:ePVJZ6n9U1RWahgN@qr.uduyoii.mongodb.net/?re
 
 const app = express();
 
-app.use(device.capture());
+// app.use(device.capture());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
@@ -38,18 +38,18 @@ app.use(cors());
 //   res.send(`User-Agent: ${userAgent}\nDevice Type: ${deviceType}`);
 // });
 
-app.use((req, res, next) => {
-  const userAgent = req.headers['user-agent'];
-  const deviceId = generateDeviceId(userAgent);
-  req.deviceId = deviceId;
-  next();
-});
+// app.use((req, res, next) => {
+//   const userAgent = req.headers['user-agent'];
+//   const deviceId = generateDeviceId(userAgent);
+//   req.deviceId = deviceId;
+//   next();
+// });
 
-function generateDeviceId(userAgent) {
-  const base64Encoded = Buffer.from(userAgent).toString('base64');
-  const truncatedId = base64Encoded.slice(18, 38);
-  return truncatedId;
-}
+// function generateDeviceId(userAgent) {
+//   const base64Encoded = Buffer.from(userAgent).toString('base64');
+//   const truncatedId = base64Encoded.slice(18, 38);
+//   return truncatedId;
+// }
 
 
 // mongodb

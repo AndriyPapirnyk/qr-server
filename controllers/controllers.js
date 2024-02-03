@@ -32,7 +32,7 @@ exports.test = async (req, res) => {
 
 exports.verifyUser = async (req, res) => {
   try {
-    const userId = req.deviceId;
+    const userId = req.body.deviceId;
     console.log(userId);
 
     const existingUser = await User.findOne({ userId: userId });
