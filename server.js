@@ -45,6 +45,17 @@ app.post('/api/user/getAllProducts', async (req, res) => {
       }
 });
 
+
+app.post('/api/user/getOrders', async (req, res) => {
+  try{
+      const orders = await Order.find();
+      res.status(200).json(orders);
+    } catch(error){
+      res.status(500).send('Internal Server Error');
+      console.error(error)
+    }
+});
+
 app.post('/api/user/saveRequest', async (req, res) => {
   try{
     const userId = req.body.userId;
