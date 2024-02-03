@@ -6,12 +6,12 @@ router.post('/verifyUser', userController.verifyUser);
 
 router.post('/createUser', userController.createUser);
 
+router.post('/getAllProducts', userController.getAllProducts);
+
+router.post('/saveRequest', userController.saveRequest);
+
 router.get('/getAllUsers', userController.getAllUsers);
 
 router.get('/getCount', userController.getCount);
-
-// router.get('/getAllProducts', userController.getAllProducts);
-
-router.get('/', userController.test);
 
 module.exports = router;
