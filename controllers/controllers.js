@@ -35,6 +35,7 @@ exports.verifyUser = async (req, res) => {
   try {
     const userId = req.body.deviceId;
     console.log(userId);
+    console.log(1)
 
     const existingUser = await User.findOne({ userId: userId });
     const currentTime = new Date();
@@ -68,10 +69,11 @@ exports.verifyUser = async (req, res) => {
 exports.createUser = async(req, res) => {
   try{
     const name = req.body.name;
+    const deviceId = req.body.deviceId;
     console.log(name)
     const currentDate = new Date();
       
-    const newUser = new User({ userId: req.deviceId, name: name, count: 1, lastScan: currentDate, history: [currentDate]  });
+    const newUser = new User({ userId: deviceId, name: name, count: 1, lastScan: currentDate, history: [currentDate]  });
     await newUser.save();      
     console.log('User created:', newUser);
     res.status(200).send({user: newUser});
