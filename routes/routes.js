@@ -6,9 +6,11 @@ router.post('/verifyUser', userController.verifyUser);
 
 router.post('/createUser', userController.createUser);
 
-router.get('/getUsers', userController.getAllUsers);
+router.get('/getAllUsers', userController.getAllUsers);
 
 router.get('/getCount', userController.getCount);
+
+// router.get('/getAllProducts', userController.getAllProducts);
 
 router.get('/', userController.test);
 

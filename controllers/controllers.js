@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Product = require('../models/product');
 
 //
 exports.test = async (req, res) => {
@@ -87,6 +88,17 @@ exports.getAllUsers = async(req, res) => {
     console.error(error)
   }
 }
+
+
+// exports.getAllProducts = async(req, res) => {
+//   try{
+//     const prodcuts = await Product.find();
+//     res.status(200).json(prodcuts)
+//   } catch(error){
+//     res.status(500).send('Internal Server Error');
+//     console.error(error)
+//   }
+// }
 
 
 exports.getCount = async(req, res) => {
