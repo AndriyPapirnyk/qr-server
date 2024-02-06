@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const PORT = 8000;
+const Order = require('./models/order')
 
 //
 
@@ -26,22 +27,22 @@ app.use(cors());
 // });
 
 
-app.post('/api/user/getAllProducts', async (req, res) => {
+app.post('/api/user/getOrders', async (req, res) => {
     try{
-        const prodcuts = await Product.find();
-        res.status(200).json(prodcuts);
+        const orders = await Order.find();
+        res.status(200).json(orders);
       } catch(error){
         res.status(500).send('Internal Server Error');
         console.error(error)
       }
 });
 
-app.post('/api/user/saveRequest', async (req, res) => {
-  try{
-    const userId = req.body.userId;
-    const fullPrice = req.body.fullPrice;
-    const productsArr = req.body.cart;
-    let user = await User.findOne({ _id: userId});
+// app.post('/api/user/saveRequest', async (req, res) => {
+//   try{
+//     const userId = req.body.userId;
+//     const fullPrice = req.body.fullPrice;
+//     const productsArr = req.body.cart;
+//     let user = await User.findOne({ _id: userId});
 
 //     user.count -= fullPrice;
 //     await User.updateOne({_id: userId}, {count: user.count});

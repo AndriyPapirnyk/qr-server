@@ -117,7 +117,7 @@ exports.saveRequest = async(req, res) => {
 
     const newDate = `${day < 10 ? '0' + day: day}/${month < 10 ? '0' + month: month}/${year}`;
 
-    const newOrder = new Order({ userId: userId, name: user.name, products: productsArr, totalPrice: fullPrice, date: newDate,  });
+    const newOrder = new Order({ userId: userId, name: user.name, products: productsArr, totalPrice: fullPrice, date: newDate, state: 'inProgres' });
     await newOrder.save();  
 
     res.status(200).send({user:user, products: allProducts});
