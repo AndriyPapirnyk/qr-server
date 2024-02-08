@@ -12,7 +12,8 @@ const orderSchema = new mongoose.Schema({
             price: Number
         }
       ],
-      totalPrice: Number
+      totalPrice: Number,
+      refusedReason: String
 });
 
 module.exports = mongoose.model('Order', orderSchema);

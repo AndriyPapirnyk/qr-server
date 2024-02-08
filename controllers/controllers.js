@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Product = require('../models/product');
+const Order = require('../models/order');
 
 //
 
@@ -44,7 +45,7 @@ exports.createUser = async(req, res) => {
     console.log(deviceId);
     const currentDate = new Date();
       
-    const newUser = new User({ userId: deviceId, name: name, count: 1, lastScan: currentDate, history: [currentDate]  });
+    const newUser = new User({ userId: deviceId, name: name, count: 1, lastScan: currentDate, history: [currentDate], items: []  });
     await newUser.save();      
     console.log('User created:', newUser);
     res.status(200).send({user: newUser});
@@ -94,6 +95,7 @@ exports.getCount = async(req, res) => {
 
 exports.saveRequest = async(req, res) => {
   try{
+    console.log('dadasd')
     const userId = req.body.userId;
     const fullPrice = req.body.fullPrice;
     const productsArr = req.body.cart;
