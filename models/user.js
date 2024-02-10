@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
       userId: String,
       name: String,
       count: Number,
+      scans: Number,
       lastScan: Date,
       items: [
             {

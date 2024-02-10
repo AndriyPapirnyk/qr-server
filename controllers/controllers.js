@@ -22,6 +22,7 @@ exports.verifyUser = async (req, res) => {
         existingUser.lastScan = currentTime;
         existingUser.history.push(formattedTime);
         existingUser.count = (existingUser.count || 0) + 1;
+        existingUser.scans = (existingUser.scans || 0) + 1;
 
         await existingUser.save();
 
@@ -45,7 +46,7 @@ exports.createUser = async(req, res) => {
     console.log(deviceId);
     const currentDate = new Date();
       
-    const newUser = new User({ userId: deviceId, name: name, count: 1, lastScan: currentDate, history: [currentDate], items: []  });
+    const newUser = new User({ userId: deviceId, name: name, scans: 1, count: 1, lastScan: currentDate, history: [currentDate], items: []  });
     await newUser.save();      
     console.log('User created:', newUser);
     res.status(200).send({user: newUser});
@@ -81,7 +82,7 @@ exports.getCount = async(req, res) => {
         {
           $group: {
             _id: null,
-            totalCount: { $sum: "$count" }
+            totalCount: { $sum: "$scans" }
           }
         }
       ]);
