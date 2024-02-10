@@ -1,6 +1,8 @@
 const User = require('../models/user');
 const Product = require('../models/product');
 const Order = require('../models/order');
+const crypto = require('crypto');
+const { encryptDeviceId, decryptDeviceId } = require('./encryptionFunctions');
 
 //
 
@@ -38,22 +40,58 @@ exports.verifyUser = async (req, res) => {
 };
 
 
-exports.createUser = async(req, res) => {
-  try{
+// exports.createUser = async(req, res) => {
+//   try{
+//     const name = req.body.name;
+//     const deviceId = req.body.deviceId;
+//     console.log(name);
+//     console.log(deviceId);
+//     const currentDate = new Date();
+      
+//     const newUser = new User({ userId: deviceId, name: name, scans: 1, count: 1, lastScan: currentDate, history: [currentDate], items: []  });
+//     await newUser.save();      
+//     console.log('User created:', newUser);
+//     res.status(200).send({user: newUser});
+//   } catch(error) {
+//     console.error(error)
+//   }
+// }
+
+exports.createUser = async (req, res) => {
+  try {
     const name = req.body.name;
     const deviceId = req.body.deviceId;
+
+    const { iv, encryptedDeviceId } = encryptDeviceId(deviceId);
+
     console.log(name);
-    console.log(deviceId);
+    console.log('Encrypted Device ID:', encryptedDeviceId);
+
     const currentDate = new Date();
       
-    const newUser = new User({ userId: deviceId, name: name, scans: 1, count: 1, lastScan: currentDate, history: [currentDate], items: []  });
+    const newUser = new User({
+      userId: encryptedDeviceId, 
+      name: name,
+      scans: 1,
+      count: 1,
+      lastScan: currentDate,
+      history: [currentDate],
+      items: []
+    });
+    
     await newUser.save();      
     console.log('User created:', newUser);
-    res.status(200).send({user: newUser});
+
+    const decryptedDeviceId = decryptDeviceId(newUser.userId, iv);
+
+    res.status(200).send({ user: { ...newUser.toObject(), decryptedDeviceId } });
   } catch(error) {
-    console.error(error)
+    console.error(error);
+    res.status(500).send({ error: 'Server error' });
   }
 }
+
+
 
 exports.getAllUsers = async(req, res) => {
   try{
