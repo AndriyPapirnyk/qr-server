@@ -1,7 +1,6 @@
 const User = require('../models/user');
 const Product = require('../models/product');
 const Order = require('../models/order');
-const crypto = require('crypto');
 const { encryptDeviceId, decryptDeviceId } = require('./cryptoFunctions');
 
 
@@ -63,6 +62,7 @@ exports.createUser = async (req, res) => {
     const name = req.body.name;
     const deviceId = req.body.deviceId;
 
+    // Шифруємо deviceId перед збереженням в базу даних
     const { iv, encryptedDeviceId } = encryptDeviceId(deviceId);
 
     console.log(name);
@@ -71,7 +71,7 @@ exports.createUser = async (req, res) => {
     const currentDate = new Date();
       
     const newUser = new User({
-      userId: encryptedDeviceId, 
+      userId: encryptedDeviceId, // Зберігаємо зашифрований deviceId
       name: name,
       scans: 1,
       count: 1,
@@ -83,9 +83,11 @@ exports.createUser = async (req, res) => {
     await newUser.save();      
     console.log('User created:', newUser);
 
+    // Розшифровуємо айді перед надсиланням відповіді
     const decryptedDeviceId = decryptDeviceId(newUser.userId, iv);
 
-    res.status(200).send({ user: { ...newUser.toObject(), decryptedDeviceId } });
+    // Надсилаємо відповідь, включаючи розшифрований айді
+    res.status(200).send({ user: { ...newUser.toObject(), userId: decryptedDeviceId } });
   } catch(error) {
     console.error(error);
     res.status(500).send({ error: 'Server error' });
@@ -94,12 +96,29 @@ exports.createUser = async (req, res) => {
 
 
 
-exports.getAllUsers = async(req, res) => {
-  try{
+// exports.getAllUsers = async(req, res) => {
+//   try{
+//     const users = await User.find();
+//     res.status(200).json(users)
+//   } catch(error){
+//     console.error(error)
+//   }
+// }
+
+exports.getAllUsers = async (req, res) => {
+  try {
     const users = await User.find();
-    res.status(200).json(users)
-  } catch(error){
-    console.error(error)
+
+    // Розшифровуємо userId кожного користувача перед відправленням відповіді
+    const decryptedUsers = users.map(user => {
+      const decryptedUserId = decryptDeviceId(user.userId, user.iv);
+      return { ...user.toObject(), userId: decryptedUserId };
+    });
+
+    res.status(200).json(decryptedUsers);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Server error' });
   }
 }
 
@@ -133,38 +152,85 @@ exports.getCount = async(req, res) => {
   }
 }
 
-exports.saveRequest = async(req, res) => {
-  try{
-    console.log('dadasd')
+// exports.saveRequest = async(req, res) => {
+//   try{
+//     console.log('dadasd')
+//     const userId = req.body.userId;
+//     const fullPrice = req.body.fullPrice;
+//     const productsArr = req.body.cart;
+//     let user = await User.findOne({ _id: userId});
+
+//     user.count -= fullPrice;
+//     await User.updateOne({_id: userId}, {count: user.count});
+
+//     for(let el of productsArr){
+//       let product = await Product.findOne({_id: el._id});
+//       product.amount -= 1;
+//       await Product.updateOne({_id: el._id}, {amount: product.amount});
+//     }
+
+//     allProducts = await Product.find({});
+
+//     const dateObj = new Date();
+//     const month   = dateObj.getUTCMonth() + 1; // months from 1-12
+//     const day     = dateObj.getUTCDate();
+//     const year    = dateObj.getUTCFullYear();
+
+//     const newDate = `${day < 10 ? '0' + day: day}/${month < 10 ? '0' + month: month}/${year}`;
+
+//     const newOrder = new Order({ userId: userId, name: user.name, products: productsArr, totalPrice: fullPrice, date: newDate, state: 'inProgres' });
+//     await newOrder.save();  
+
+//     res.status(200).send({user:user, products: allProducts});
+//   } catch(error) {
+//     console.error(error)
+//   }
+// }
+
+exports.saveRequest = async (req, res) => {
+  try {
+    console.log('dadasd');
     const userId = req.body.userId;
     const fullPrice = req.body.fullPrice;
     const productsArr = req.body.cart;
-    let user = await User.findOne({ _id: userId});
+
+    // Шифруємо userId перед пошуком користувача в базі даних
+    const { iv, encryptedUserId } = encryptDeviceId(userId);
+
+    let user = await User.findOne({ userId: encryptedUserId });
+
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+
+    // Розшифровуємо userId перед оновленням кількості товарів користувача
+    const decryptedUserId = decryptDeviceId(user.userId, iv);
 
     user.count -= fullPrice;
-    await User.updateOne({_id: userId}, {count: user.count});
+    await User.updateOne({ userId: encryptedUserId }, { count: user.count });
 
-    for(let el of productsArr){
-      let product = await Product.findOne({_id: el._id});
+    for (let el of productsArr) {
+      let product = await Product.findOne({ _id: el._id });
       product.amount -= 1;
-      await Product.updateOne({_id: el._id}, {amount: product.amount});
+      await Product.updateOne({ _id: el._id }, { amount: product.amount });
     }
 
     allProducts = await Product.find({});
 
     const dateObj = new Date();
-    const month   = dateObj.getUTCMonth() + 1; // months from 1-12
-    const day     = dateObj.getUTCDate();
-    const year    = dateObj.getUTCFullYear();
+    const month = dateObj.getUTCMonth() + 1; // months from 1-12
+    const day = dateObj.getUTCDate();
+    const year = dateObj.getUTCFullYear();
 
-    const newDate = `${day < 10 ? '0' + day: day}/${month < 10 ? '0' + month: month}/${year}`;
+    const newDate = `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
 
-    const newOrder = new Order({ userId: userId, name: user.name, products: productsArr, totalPrice: fullPrice, date: newDate, state: 'inProgres' });
-    await newOrder.save();  
+    const newOrder = new Order({ userId: decryptedUserId, name: user.name, products: productsArr, totalPrice: fullPrice, date: newDate, state: 'inProgres' });
+    await newOrder.save();
 
-    res.status(200).send({user:user, products: allProducts});
-  } catch(error) {
-    console.error(error)
+    res.status(200).send({ user: user, products: allProducts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Server error' });
   }
 }
 
