@@ -2,7 +2,8 @@ const User = require('../models/user');
 const Product = require('../models/product');
 const Order = require('../models/order');
 const crypto = require('crypto');
-const { encryptDeviceId, decryptDeviceId } = require('./encryptionFunctions');
+const { encryptDeviceId, decryptDeviceId } = require('./cryptoFunctions');
+
 
 //
 
